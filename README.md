@@ -25,6 +25,18 @@ Swarmtally is a full-stack AI application that runs YOLOv8 drone detection infer
 
 **Design theme:** "Duty and Honor" — a military-inspired tactical interface using olive, saffron, and navy.
 
+### User Interface
+
+#### 1. Dashboard (Main Upload Portal)
+The default dashboard features a clean, military-tactical grid layout displaying the active AI model version, detection class, confidence threshold, and a drag-and-drop secure imagery transfer drop zone.
+
+![Dashboard](docs/screenshots/dashboard.png)
+
+#### 2. Image Checker & Pre-Verification
+Once an image is selected, the visual image checker loads it instantly, displaying details like filename, file size, format, and status. This allows the operator to verify they have selected the correct image before submitting it to the YOLOv8 model for automated detection.
+
+![Image Checker](docs/screenshots/image_checker.png)
+
 ### Key Features
 
 - 🎯 **Real-time drone detection** using a custom-trained YOLOv8n model
