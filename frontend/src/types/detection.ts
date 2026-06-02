@@ -16,7 +16,7 @@ export interface DetectionResult {
   drone_count: number
 
   /** Confidence scores (0–1) for each detected drone, ordered by detection */
-  confidences: number[]
+  confidences?: number[]
 
   /**
    * Relative URL path to the annotated result image served by the backend.
@@ -26,7 +26,7 @@ export interface DetectionResult {
   processed_image_url: string
 
   /** Time taken for YOLOv8 inference in milliseconds */
-  inference_ms: number
+  inference_ms?: number
 }
 
 /**

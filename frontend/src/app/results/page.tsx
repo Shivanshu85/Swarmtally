@@ -196,18 +196,6 @@ export default function ResultsPage() {
                 </div>
               </div>
 
-              {/* Image caption / inference stats */}
-              <div className="mt-2 flex flex-wrap gap-x-5 gap-y-1">
-                <p className="text-[10px] text-[#77786b] uppercase tracking-widest">
-                  Inference: {result.inference_ms} ms
-                </p>
-                <p className="text-[10px] text-[#77786b] uppercase tracking-widest">
-                  Conf. Threshold: 0.25
-                </p>
-                <p className="text-[10px] text-[#77786b] uppercase tracking-widest">
-                  Model: YOLOv8n
-                </p>
-              </div>
             </div>
 
             {/* ── RIGHT: Detection summary sidebar ─────────────────────── */}
@@ -264,76 +252,6 @@ export default function ResultsPage() {
                 </div>
               </div>
 
-              {/* ── Confidence scores table ─────────────────────────────── */}
-              {result.confidences.length > 0 && (
-                <div
-                  className="mt-4 bg-white border border-[#c8c7b8] overflow-hidden"
-                  style={{ borderTop: '4px solid #4b5320' }}
-                >
-                  {/* Table header */}
-                  <div className="px-5 py-3 bg-[#f3f4f5] border-b border-[#e1e3e4]">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#47483c]">
-                      Contact Confidence Log
-                    </p>
-                  </div>
-
-                  {/* Confidence rows */}
-                  <div className="divide-y divide-[#f3f4f5]">
-                    {result.confidences.map((conf, index) => {
-                      const pct = Math.round(conf * 100)
-                      const label = `DRN-${String(index + 1).padStart(2, '0')}`
-                      return (
-                        <div
-                          key={`${index}-${conf}`}
-                          id={`confidence-row-${index + 1}`}
-                          className="px-5 py-3 flex items-center gap-3"
-                        >
-                          {/* Drone label badge */}
-                          <span
-                            className="text-[10px] font-bold uppercase tracking-wider text-white bg-[#8f4e00] px-2 py-0.5 rounded-sm flex-shrink-0"
-                            aria-label={`Drone ${index + 1}`}
-                          >
-                            {label}
-                          </span>
-
-                          {/* Confidence bar */}
-                          <div className="flex-1 relative h-2 bg-[#e1e3e4] rounded-full overflow-hidden">
-                            <div
-                              className="absolute inset-y-0 left-0 bg-[#fe9832] rounded-full transition-all duration-500"
-                              style={{ width: `${pct}%` }}
-                              role="progressbar"
-                              aria-valuenow={pct}
-                              aria-valuemin={0}
-                              aria-valuemax={100}
-                              aria-label={`${label} confidence: ${pct}%`}
-                            />
-                          </div>
-
-                          {/* Percentage */}
-                          <span className="text-xs font-bold text-[#343c0a] tabular-nums flex-shrink-0 w-10 text-right">
-                            {pct}%
-                          </span>
-                        </div>
-                      )
-                    })}
-                  </div>
-
-                  {/* Average confidence footer */}
-                  <div className="px-5 py-3 bg-[#f3f4f5] border-t border-[#e1e3e4] flex justify-between">
-                    <span className="text-[10px] uppercase tracking-widest text-[#77786b] font-bold">
-                      Avg. Confidence
-                    </span>
-                    <span className="text-xs font-bold text-[#343c0a]">
-                      {Math.round(
-                        (result.confidences.reduce((a, b) => a + b, 0) /
-                          result.confidences.length) *
-                          100,
-                      )}%
-                    </span>
-                  </div>
-                </div>
-              )}
-
               {/* ── Mobile Re-Detect button ──────────────────────────────── */}
               <div className="lg:hidden mt-5">
                 <button
@@ -350,19 +268,6 @@ export default function ResultsPage() {
                   </svg>
                   Re-Detect
                 </button>
-              </div>
-
-              {/* ── Metadata footer ──────────────────────────────────────── */}
-              <div className="mt-4 p-4 bg-white border border-[#e1e3e4] hidden lg:block">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-[#77786b] mb-2">
-                  Session Metadata
-                </p>
-                <div className="space-y-1">
-                  <MetaRow label="Inference Time" value={`${result.inference_ms} ms`} />
-                  <MetaRow label="Total Contacts" value={`${result.drone_count}`} />
-                  <MetaRow label="Confidence Threshold" value="0.25" />
-                  <MetaRow label="Model Version" value="YOLOv8n" />
-                </div>
               </div>
             </div>
           </div>
@@ -381,16 +286,6 @@ export default function ResultsPage() {
           </button>
         </div>
       )}
-    </div>
-  )
-}
-
-/* ── MetaRow helper ─────────────────────────────────────────────────────── */
-function MetaRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex justify-between">
-      <span className="text-[10px] text-[#77786b] uppercase tracking-wider">{label}</span>
-      <span className="text-[10px] font-bold text-[#343c0a]">{value}</span>
     </div>
   )
 }

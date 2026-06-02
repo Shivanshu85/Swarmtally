@@ -243,61 +243,19 @@ async def detect_drones(background_tasks: BackgroundTasks, file: UploadFile = Fi
     boxes = results[0].boxes
     drone_count = len(boxes)
 
-    # ── 6. Extract confidence scores ────────────────────────────────────────
-    confidences: list[float] = []
-    if drone_count > 0:
-        confidences = [round(float(c), 4) for c in boxes.conf.tolist()]
-
-    # ── 7. Draw custom bounding boxes on the image ──────────────────────────
+    # ── 6. Draw custom bounding boxes on the image ──────────────────────────
     # Draw directly on the image array (in-place) to avoid copying overhead
+    # Keep ONLY the saffron border rectangles; remove all labels and text overlays
     annotated = img
 
-    for idx, box in enumerate(boxes):
+    for box in boxes:
         # Bounding box coordinates
         x1, y1, x2, y2 = map(int, box.xyxy[0].tolist())
-        conf = float(box.conf[0])
-
-        # Label format: "DRN-01: 91.2%"
-        label = f"DRN-{idx + 1:02d}: {conf * 100:.1f}%"
 
         # Draw saffron border rectangle (2px thick)
         cv2.rectangle(annotated, (x1, y1), (x2, y2), SAFFRON_BGR, 2)
 
-        # Draw olive label background
-        (text_w, text_h), baseline = cv2.getTextSize(
-            label, cv2.FONT_HERSHEY_SIMPLEX, 0.45, 1
-        )
-        # If the label goes above the image frame, draw it inside the bounding box
-        if y1 - text_h - baseline - 6 < 0:
-            label_y1 = y1
-            label_y2 = y1 + text_h + baseline + 6
-            text_y = y1 + text_h + 3
-        else:
-            label_y1 = y1 - text_h - baseline - 6
-            label_y2 = y1
-            text_y = y1 - baseline - 2
-
-        cv2.rectangle(
-            annotated,
-            (x1, label_y1),
-            (x1 + text_w + 6, label_y2),
-            OLIVE_BGR,
-            -1,  # Filled
-        )
-
-        # Draw white label text
-        cv2.putText(
-            annotated,
-            label,
-            (x1 + 3, text_y),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            0.45,
-            (255, 255, 255),
-            1,
-            cv2.LINE_AA,
-        )
-
-    # ── 8. Save annotated image ─────────────────────────────────────────────
+    # ── 7. Save annotated image ─────────────────────────────────────────────
     out_filename = f"result_{uuid.uuid4().hex[:10]}.jpg"
     out_path = OUTPUT_DIR / out_filename
     cv2.imwrite(
@@ -309,13 +267,11 @@ async def detect_drones(background_tasks: BackgroundTasks, file: UploadFile = Fi
     # Reclaim memory explicitly
     gc.collect()
 
-    # ── 9. Return JSON response ─────────────────────────────────────────────
+    # ── 8. Return JSON response ─────────────────────────────────────────────
     return JSONResponse(
         content={
             "drone_count": drone_count,
-            "confidences": confidences,
             "processed_image_url": f"/outputs/{out_filename}",
-            "inference_ms": inference_ms,
         }
     )
 
