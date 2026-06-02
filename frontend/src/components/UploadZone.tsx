@@ -28,7 +28,7 @@ const ALLOWED_EXTS = ['.jpg', '.jpeg', '.png']
 const MAX_UPLOAD_BYTES = 10 * 1024 * 1024
 
 /* ── Component ─────────────────────────────────────────────────────────── */
-export default function UploadZone({ onFileSelect, hasFile }: UploadZoneProps) {
+export default function UploadZone({ onFileSelect, hasFile: _hasFile }: UploadZoneProps) {
   const [isDragging, setIsDragging] = useState(false)
   const [validationError, setValidationError] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
