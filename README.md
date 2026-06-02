@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Swarmtally Banner](docs/screenshots/banner.jpg)
+![Swarmtally Banner](docs/screenshots/banner.png)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)](https://python.org)
