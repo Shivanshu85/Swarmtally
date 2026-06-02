@@ -2,9 +2,8 @@
 
 <div align="center">
 
-![Swarmtally Banner](https://img.shields.io/badge/Swarmtally-Drone%20Detection-4b5320?style=for-the-badge&logo=drone&logoColor=white)
+![Swarmtally Banner](docs/screenshots/banner.jpg)
 
-[![CI](https://github.com/YOUR_USERNAME/Drone_detection/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR_USERNAME/Drone_detection/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)](https://python.org)
 [![Next.js](https://img.shields.io/badge/Next.js-14-black?logo=next.js)](https://nextjs.org)
@@ -13,7 +12,7 @@
 
 **AI-powered web application that detects and counts drones in uploaded images using a trained YOLOv8 model.**
 
-[Live Demo](#deployment) · [API Docs](#api-reference) · [Docker Setup](#docker-one-command-startup) · [Deployment](#deployment)
+[Live Demo](https://swarmtallycom-lovat.vercel.app) · [API Docs](https://docs.ultralytics.com/models/yolov8) · [Docker Setup](https://docs.docker.com/get-started/introduction/get-docker-desktop/) · [Deployment](https://vercel.com/docs/deployments)
 
 </div>
 
