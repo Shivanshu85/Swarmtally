@@ -37,15 +37,10 @@ Once an image is selected, the visual image checker loads it instantly, displayi
 
 ![Image Checker](docs/screenshots/image_checker.png)
 
-#### 3. Swarm Detection Results
-If the model detects a high volume of active targets (e.g., 10+ drones), the system triggers a **Swarm Detected** threat level. The interface displays an annotated image with saffron bounding boxes, an absolute target count, and a detailed confidence log for every registered contact.
+#### 3. Detection Results
+The results page displays the annotated image with saffron bounding boxes around detected targets, an absolute drone count, a threat level badge, and a tactical contact confidence log list displaying per-drone confidence progress bars and values.
 
-![Swarm Detection Results](docs/screenshots/results_swarm.png)
-
-#### 4. Multiple Contacts Results
-For mid-range detections, the threat level is flagged as **Multiple Contacts**. The results page shows the exact spatial location of all targets, confidence progress bars, and comprehensive session metadata (inference time, confidence threshold, and AI model model/version details).
-
-![Multiple Contacts Results](docs/screenshots/results_multiple.png)
+![Detection Results](docs/screenshots/results.png)
 
 ### Key Features
 
