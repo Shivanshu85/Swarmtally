@@ -276,42 +276,6 @@ make docker-logs  # Stream logs
 
 > **Docker note:** Uploaded images and annotated results are persisted in named Docker volumes (`swarmtally-uploads`, `swarmtally-outputs`). They survive container restarts.
 
----
-
-## Deployment
-
-### Frontend → Vercel
-
-1. Push your repository to GitHub
-2. Go to [vercel.com](https://vercel.com) → **Add New Project** → Import your repo
-3. Set **Root Directory** to `frontend`
-4. Add environment variables in Vercel dashboard:
-
-   | Variable | Value |
-   |---|---|
-   | `API_URL` | `https://your-backend.onrender.com` |
-   | `NEXT_PUBLIC_API_URL` | `https://your-backend.onrender.com` |
-
-5. Click **Deploy** — Vercel reads `vercel.json` automatically
-
-### Backend → Render
-
-1. Push your repository to GitHub
-2. Go to [render.com](https://render.com) → **New Web Service** → Connect your repo
-3. Set **Root Directory** to `backend`
-4. Render will auto-detect `render.yaml` and configure the service
-5. Add environment variable in Render dashboard:
-
-   | Variable | Value |
-   |---|---|
-   | `FRONTEND_URL` | `https://your-app.vercel.app` |
-
-6. Click **Deploy**
-
-> **Important:** The `best.pt` model file must be committed to your repository (it's ~6MB). The CI pipeline skips model loading — only local/Docker/Render runs load it.
-
----
-
 ## API Reference
 
 ### `POST /detect`
