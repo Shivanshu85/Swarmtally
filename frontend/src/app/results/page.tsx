@@ -24,34 +24,6 @@ import MobileNav from '@/components/MobileNav'
 import SkeletonLoader from '@/components/SkeletonLoader'
 import type { DetectionResult } from '@/types/detection'
 
-/* ── Deterministic dynamic generator for confidence scores ───────────────── */
-function getDeterministicConfidences(filename: string, count: number): number[] {
-  if (count <= 0) return []
-
-  let hash = 0
-  for (let i = 0; i < filename.length; i++) {
-    hash = filename.charCodeAt(i) + ((hash << 5) - hash)
-  }
-
-  const lcg = (seed: number) => {
-    let state = Math.abs(seed) || 1
-    return () => {
-      state = (state * 1664525 + 1013904223) % 4294967296
-      return state / 4294967296
-    }
-  }
-
-  const rand = lcg(hash)
-  const list: number[] = []
-
-  for (let i = 0; i < count; i++) {
-    const val = 0.26 + rand() * 0.62 // generates 26% to 88%
-    list.push(Number(val.toFixed(4)))
-  }
-
-  return list.sort((a, b) => b - a)
-}
-
 /* ── Page component ──────────────────────────────────────────────────────── */
 export default function ResultsPage() {
   const router = useRouter()
@@ -64,13 +36,6 @@ export default function ResultsPage() {
   // Backend base URL (for constructing image URLs)
   const apiUrl =
     process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
-
-  // Calculate dynamic confidences from result if not returned by backend
-  const confidences = result
-    ? result.confidences && result.confidences.length > 0
-      ? result.confidences
-      : getDeterministicConfidences(result.processed_image_url || 'result_fallback', result.drone_count)
-    : []
 
   /* ── Read results from sessionStorage on mount ─────────────────────────── */
   useEffect(() => {
@@ -286,76 +251,6 @@ export default function ResultsPage() {
                   )}
                 </div>
               </div>
-
-              {/* ── Confidence scores table ─────────────────────────────── */}
-              {confidences.length > 0 && (
-                <div
-                  className="mt-4 bg-white border border-[#c8c7b8] overflow-hidden"
-                  style={{ borderTop: '4px solid #4b5320' }}
-                >
-                  {/* Table header */}
-                  <div className="px-5 py-3 bg-[#f3f4f5] border-b border-[#e1e3e4]">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#47483c]">
-                      Contact Confidence Log
-                    </p>
-                  </div>
-
-                  {/* Confidence rows */}
-                  <div className="divide-y divide-[#f3f4f5]">
-                    {confidences.map((conf, index) => {
-                      const pct = Math.round(conf * 100)
-                      const label = `DRN-${String(index + 1).padStart(2, '0')}`
-                      return (
-                        <div
-                          key={`${index}-${conf}`}
-                          id={`confidence-row-${index + 1}`}
-                          className="px-5 py-3.5 flex items-center gap-3"
-                        >
-                          {/* Drone label badge */}
-                          <span
-                            className="text-[10px] font-bold uppercase tracking-wider text-white bg-[#8f4e00] px-2 py-0.5 rounded flex-shrink-0"
-                            aria-label={`Drone ${index + 1}`}
-                          >
-                            {label}
-                          </span>
-
-                          {/* Confidence bar */}
-                          <div className="flex-1 relative h-2 bg-[#e1e3e4] rounded-full overflow-hidden">
-                            <div
-                              className="absolute inset-y-0 left-0 bg-[#fe9832] rounded-full"
-                              style={{ width: `${pct}%` }}
-                              role="progressbar"
-                              aria-valuenow={pct}
-                              aria-valuemin={0}
-                              aria-valuemax={100}
-                              aria-label={`${label} confidence: ${pct}%`}
-                            />
-                          </div>
-
-                          {/* Percentage */}
-                          <span className="text-xs font-bold text-[#343c0a] tabular-nums flex-shrink-0 w-10 text-right">
-                            {pct}%
-                          </span>
-                        </div>
-                      )
-                    })}
-                  </div>
-
-                  {/* Average confidence footer */}
-                  <div className="px-5 py-3 bg-[#f3f4f5] border-t border-[#e1e3e4] flex justify-between">
-                    <span className="text-[10px] uppercase tracking-widest text-[#77786b] font-bold">
-                      Average Confidence
-                    </span>
-                    <span className="text-xs font-bold text-[#343c0a]">
-                      {Math.round(
-                        (confidences.reduce((a, b) => a + b, 0) /
-                          confidences.length) *
-                          100,
-                      )}%
-                    </span>
-                  </div>
-                </div>
-              )}
 
               {/* ── Mobile Re-Detect button ──────────────────────────────── */}
               <div className="lg:hidden mt-5">
