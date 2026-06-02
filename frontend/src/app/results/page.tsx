@@ -60,8 +60,19 @@ export default function ResultsPage() {
     }
   }, [router])
 
-  /* ── Navigate back to upload ───────────────────────────────────────────── */
+  /* ── Navigate back to upload & trigger session cleanup ────────────────── */
   const handleReDetect = () => {
+    if (result?.processed_image_url) {
+      const filename = result.processed_image_url.split('/').pop()
+      if (filename) {
+        fetch(`${apiUrl}/cleanup/${filename}`, {
+          method: 'DELETE',
+        }).catch((err) => {
+          // eslint-disable-next-line no-console
+          console.error('Failed to run session cleanup:', err)
+        })
+      }
+    }
     sessionStorage.removeItem('detectionResult')
     sessionStorage.removeItem('originalImageUrl')
     router.push('/')

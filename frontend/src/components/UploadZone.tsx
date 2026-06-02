@@ -24,8 +24,8 @@ interface UploadZoneProps {
 const ALLOWED_TYPES = ['image/jpeg', 'image/png']
 const ALLOWED_EXTS = ['.jpg', '.jpeg', '.png']
 
-// Maximum upload size – must match backend MAX_FILE_SIZE_BYTES (50 MB)
-const MAX_UPLOAD_BYTES = 50 * 1024 * 1024
+// Maximum upload size – must match backend MAX_FILE_SIZE_BYTES (10 MB)
+const MAX_UPLOAD_BYTES = 10 * 1024 * 1024
 
 /* ── Component ─────────────────────────────────────────────────────────── */
 export default function UploadZone({ onFileSelect, hasFile }: UploadZoneProps) {
@@ -165,11 +165,11 @@ export default function UploadZone({ onFileSelect, hasFile }: UploadZoneProps) {
             <span className="hidden md:inline">
              Accepted formats: JPG, JPEG, PNG.
              <br />
-              Maximum file size: 50 MB.
+              Maximum file size: 10 MB.
             </span>
             <span className="md:hidden">
               Supported formats: JPG, PNG.
-              Maximum file size: 50 MB.
+              Maximum file size: 10 MB.
             </span>
           </p>
 

@@ -52,9 +52,10 @@ For mid-range detections, the threat level is flagged as **Multiple Contacts**. 
 - 🎯 **Real-time drone detection** using a custom-trained YOLOv8n model
 - 📊 **Per-drone confidence scores** with visual progress bars
 - 🖼️ **Annotated output images** with saffron bounding boxes (DRN-01, DRN-02...)
-- ⚡ **Fast inference** — typically 50–200ms depending on hardware
-- 🐳 **Docker-ready** — one command to run the full stack
-- 🚀 **Deployment-ready** — Vercel (frontend) + Render (backend)
+- ⚡ **Fast non-blocking inference** — runs in an async thread pool to handle concurrent requests efficiently
+- 🧹 **Session Auto-Cleanup** — deletes uploaded files and annotated results from the server instantly when the user completes a session or runs another detection
+- 🐳 **Docker-ready** — one command to run the full stack (with optimized python-based container healthchecks)
+- 🚀 **Deployment-ready** — Vercel (frontend) + Render (backend) with explicit CORS configurations
 - 📱 **Responsive** — works on desktop and mobile
 
 ---
@@ -143,15 +144,16 @@ Drone_detection/
 User Uploads Image
         ↓
 Next.js Frontend (port 3000)
-  – File validation (type, size)
+  – File validation (type, size max 10MB)
   – Drag-and-drop or click upload
         ↓ POST /api/detect (Next.js proxy)
 FastAPI Backend (port 8000)
   – File extension validation
+  – Size & dimension verification (max 10MB, max 8192px)
   – OpenCV image decode
         ↓
 YOLOv8 Inference (best.pt)
-  conf_threshold = 0.25
+  conf_threshold = 0.25 (run in non-blocking thread pool)
         ↓
 count = len(results[0].boxes)
         ↓
@@ -168,6 +170,9 @@ Frontend results page
   – Threat level badge (Area Clear / Single / Multiple / Swarm)
   – Per-drone confidence bars
   – Session metadata (inference time, model version)
+        ↓ Click Re-Detect (Session Ends)
+DELETE /cleanup/{filename}
+  – Backend deletes the temporary annotated file and cleans up the session
 ```
 
 ---
@@ -353,6 +358,25 @@ Returns API health status.
 ### `GET /outputs/{filename}`
 
 Serves annotated result images as static files.
+
+### `DELETE /cleanup/{filename}`
+
+Deletes a temporary annotated result image from the server when a session completes or the user requests a new detection (idempotent, returns status 200). Only filenames matching `result_[a-f0-9]{10}.jpg` are accepted to ensure directory safety.
+
+**Path Parameters:**
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `filename` | `string` | ✅ | The filename of the result image to delete |
+
+**Success Response (200):**
+
+```json
+{
+  "status": "ok",
+  "filename": "result_abc12345.jpg"
+}
+```
 
 ---
 
