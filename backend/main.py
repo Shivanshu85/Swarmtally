@@ -9,19 +9,35 @@ Endpoints:
   GET  /outputs/{file}   – Serve annotated result images (static)
 """
 
+import sys
+from unittest.mock import MagicMock
+# Prevent heavy plotting libraries from loading in production (saves RAM & startup time)
+sys.modules['matplotlib'] = MagicMock()
+sys.modules['matplotlib.pyplot'] = MagicMock()
+sys.modules['matplotlib.font_manager'] = MagicMock()
+sys.modules['seaborn'] = MagicMock()
+sys.modules['scipy'] = MagicMock()
+
 import asyncio
 import os
 import re
 import uuid
 import time
+import gc
 from pathlib import Path
 
 from logging_config import setup_logging
 setup_logging()
 
+import torch
+# Configure PyTorch for single-threaded CPU execution to prevent CPU throttling & OOMs on Render
+torch.set_num_threads(1)
+torch.set_num_interop_threads(1)
+torch.set_grad_enabled(False)
+
 import cv2
 import numpy as np
-from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi import FastAPI, File, UploadFile, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
@@ -114,6 +130,21 @@ OLIVE_BGR = (32, 83, 75)
 CONF_THRESHOLD = 0.25
 
 
+def cleanup_stale_files():
+    """Deletes files in outputs directory that are older than 5 minutes (300 seconds)."""
+    now = time.time()
+    try:
+        for file in OUTPUT_DIR.iterdir():
+            if file.is_file() and file.name.startswith("result_"):
+                if now - file.stat().st_mtime > 300:
+                    try:
+                        file.unlink()
+                    except Exception:
+                        pass
+    except Exception:
+        pass
+
+
 # ─────────────────────────────────────────────
 # Endpoints
 # ─────────────────────────────────────────────
@@ -130,7 +161,7 @@ def health_check():
 
 
 @app.post("/detect", tags=["Detection"])
-async def detect_drones(file: UploadFile = File(...)):
+async def detect_drones(background_tasks: BackgroundTasks, file: UploadFile = File(...)):
     """
     Accepts an image upload, runs YOLOv8 drone detection inference,
     draws saffron bounding boxes, and returns detection metadata.
@@ -141,6 +172,9 @@ async def detect_drones(file: UploadFile = File(...)):
         processed_image_url – Path to the annotated result image
         inference_ms      – Inference time in milliseconds
     """
+    # Trigger background cleanup of stale files
+    background_tasks.add_task(cleanup_stale_files)
+
     # ── 1. Validate file extension ─────────────────────────────────────────
     ext = Path(file.filename or "").suffix.lower()
     if ext not in ALLOWED_EXTENSIONS:
@@ -174,6 +208,14 @@ async def detect_drones(file: UploadFile = File(...)):
             detail="Could not decode image. Ensure it is a valid JPEG or PNG file.",
         )
 
+    # ── 3.1 Resize image to maximum 640x640 to optimize memory & CPU ────────
+    h, w = img.shape[:2]
+    if max(h, w) > 640:
+        scale = 640.0 / max(h, w)
+        new_w = int(w * scale)
+        new_h = int(h * scale)
+        img = cv2.resize(img, (new_w, new_h), interpolation=cv2.INTER_AREA)
+
     # Guard against extremely large images that would exhaust RAM during inference
     h, w = img.shape[:2]
     if h > MAX_IMAGE_DIMENSION or w > MAX_IMAGE_DIMENSION:
@@ -188,11 +230,11 @@ async def detect_drones(file: UploadFile = File(...)):
     # ── 4. Run YOLOv8 inference ─────────────────────────────────────────────
     #   conf=0.25  – minimum confidence threshold as per PRD
     #   Runs in a thread pool executor so the async event loop is NOT blocked.
-    #   Without this, concurrent requests would queue behind each inference call.
+    #   We specify imgsz=640 and device='cpu' to optimize CPU & RAM usage.
     start_time = time.perf_counter()
     loop = asyncio.get_event_loop()
     results = await loop.run_in_executor(
-        None, lambda: model(img, conf=CONF_THRESHOLD, verbose=False)
+        None, lambda: model(img, imgsz=640, conf=CONF_THRESHOLD, device='cpu', verbose=False)
     )
     inference_ms = round((time.perf_counter() - start_time) * 1000, 1)
 
@@ -207,7 +249,8 @@ async def detect_drones(file: UploadFile = File(...)):
         confidences = [round(float(c), 4) for c in boxes.conf.tolist()]
 
     # ── 7. Draw custom bounding boxes on the image ──────────────────────────
-    annotated = img.copy()
+    # Draw directly on the image array (in-place) to avoid copying overhead
+    annotated = img
 
     for idx, box in enumerate(boxes):
         # Bounding box coordinates
@@ -262,6 +305,9 @@ async def detect_drones(file: UploadFile = File(...)):
         annotated,
         [cv2.IMWRITE_JPEG_QUALITY, 92],
     )
+
+    # Reclaim memory explicitly
+    gc.collect()
 
     # ── 9. Return JSON response ─────────────────────────────────────────────
     return JSONResponse(

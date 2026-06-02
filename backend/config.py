@@ -23,7 +23,7 @@ OUTPUT_DIR = BASE_DIR / "outputs"
 MODEL_PATH = BASE_DIR / "best.pt"
 
 # ── File upload limits ─────────────────────────────────────────────────────────
-MAX_FILE_SIZE_MB: int = 50                        # Maximum accepted upload size
+MAX_FILE_SIZE_MB: int = 10                        # Maximum accepted upload size
 ALLOWED_EXTENSIONS: frozenset[str] = frozenset({".jpg", ".jpeg", ".png"})
 
 # ── YOLOv8 inference ──────────────────────────────────────────────────────────
