@@ -1,0 +1,119 @@
+/* ──────────────────────────────────────────────────────────────────────────
+   Swarmtally – Global Styles
+   Design System: "Duty and Honor" (military / utilitarian aesthetic)
+   Font: Inter (Google Fonts)
+   ────────────────────────────────────────────────────────────────────────── */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── CSS Custom Properties (Design Tokens) ──────────────────────────────── */
+:root {
+  --olive-900: #191e00;
+  --olive-800: #343c0a;
+  --olive-700: #434b18;
+  --olive-600: #4b5320;
+  --olive-400: #c3cc8c;
+  --saffron-700: #8f4e00;
+  --saffron-600: #fe9832;
+  --navy-700: #222894;
+  --surface: #f8f9fa;
+  --surface-low: #f3f4f5;
+  --on-surface: #191c1d;
+  --on-surface-variant: #47483c;
+  --outline: #77786b;
+  --outline-variant: #c8c7b8;
+  --grid-line: #e1e3e4;
+}
+
+/* ── Base Reset ──────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: var(--surface);
+  color: var(--on-surface);
+  margin: 0;
+  padding: 0;
+}
+
+/* ── Grid Background Pattern ─────────────────────────────────────────────── */
+/* Mimics the "blueprint / ledger" aesthetic from the Duty and Honor design    */
+.grid-bg {
+  background-color: var(--surface);
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 39px,
+      var(--grid-line) 39px,
+      var(--grid-line) 40px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 39px,
+      var(--grid-line) 39px,
+      var(--grid-line) 40px
+    );
+}
+
+/* ── Card Accent Top Borders ─────────────────────────────────────────────── */
+/* Used on all card components per the Duty and Honor spec                     */
+.card-accent-olive {
+  border-top: 4px solid var(--olive-600);
+}
+
+.card-accent-saffron {
+  border-top: 4px solid var(--saffron-600);
+}
+
+/* ── Skeleton Loader Animation ───────────────────────────────────────────── */
+@keyframes skeleton-shimmer {
+  0% { background-position: -800px 0; }
+  100% { background-position: 800px 0; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    #e1e3e4 25%,
+    #eff0f1 50%,
+    #e1e3e4 75%
+  );
+  background-size: 800px 100%;
+  animation: skeleton-shimmer 1.6s ease-in-out infinite;
+  border-radius: 2px;
+}
+
+/* ── Upload zone drag-over highlight ─────────────────────────────────────── */
+.upload-zone-active {
+  border-color: var(--olive-600) !important;
+  background-color: rgba(223, 232, 166, 0.15);
+}
+
+/* ── Scrollbar styling ───────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--surface-low);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--outline-variant);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--outline);
+}

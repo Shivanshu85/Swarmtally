@@ -1,0 +1,58 @@
+# =============================================================================
+# Swarmtally – docker-compose.yml
+# One command to run the full stack: docker-compose up
+# =============================================================================
+# Note: 'version' key is deprecated in Compose v2+ and intentionally omitted.
+
+services:
+
+  # ── FastAPI Backend ─────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: swarmtally-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:3000}
+      - PORT=8000
+    volumes:
+      # Persist uploaded images and annotated results across restarts
+      - swarmtally-uploads:/app/uploads
+      - swarmtally-outputs:/app/outputs
+    healthcheck:
+      # Chainguard runtime has no curl/wget – use Python's built-in urllib.
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s  # Give model time to load
+
+  # ── Next.js Frontend ─────────────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        # Backend URL used at build time for Next.js standalone output
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+    container_name: swarmtally-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - API_URL=${API_URL:-http://backend:8000}
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+      - NODE_ENV=production
+    depends_on:
+      backend:
+        condition: service_healthy
+
+# ── Named Volumes ─────────────────────────────────────────────────────────────
+volumes:
+  swarmtally-uploads:
+    driver: local
+  swarmtally-outputs:
+    driver: local

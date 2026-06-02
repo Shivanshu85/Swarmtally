@@ -1,0 +1,9 @@
+# Prettier ignore – files and directories that should not be formatted
+.next/
+out/
+build/
+node_modules/
+public/
+*.min.js
+*.min.css
+package-lock.json

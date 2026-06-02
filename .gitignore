@@ -1,0 +1,111 @@
+# =============================================================================
+# Swarmtally – .gitignore
+# =============================================================================
+
+# ── Python ───────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+var/
+sdist/
+develop-eggs/
+.installed.cfg
+lib/
+lib64/
+venv/
+.venv/
+env/
+ENV/
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.pytype/
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+nosetests.xml
+pylint.out
+
+# ── Environment variables (NEVER commit secrets) ──────────────────────────────
+.env
+.env.local
+.env.*.local
+.env.production
+!.env.example
+
+# ── AI Model weights (large binary files — store via Git LFS or cloud) ───────
+# Uncomment if you want to exclude best.pt from git:
+# backend/best.pt
+
+# ── Backend runtime directories ───────────────────────────────────────────────
+backend/uploads/
+backend/outputs/
+
+# ── Node.js ───────────────────────────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# ── Next.js build artifacts ───────────────────────────────────────────────────
+frontend/.next/
+frontend/out/
+frontend/build/
+
+# ── Vercel ────────────────────────────────────────────────────────────────────
+.vercel
+
+# ── TypeScript ────────────────────────────────────────────────────────────────
+*.tsbuildinfo
+next-env.d.ts
+
+# ── OS / IDE ──────────────────────────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+.idea/
+*.iml
+.vscode/settings.json
+.vscode/launch.json
+
+# ── Docker ────────────────────────────────────────────────────────────────────
+# (docker-compose.override.yml is intentionally excluded)
+docker-compose.override.yml
+
+# ── Logs ─────────────────────────────────────────────────────────────────────
+*.log
+logs/
+
+# ── Testing ───────────────────────────────────────────────────────────────────
+.pytest_cache/
+coverage/
+
+# ── Jupyter Notebooks (training) ─────────────────────────────────────────────
+.ipynb_checkpoints/
+
+# ── Training results ─────────────────────────────────────────────────────────
+training_Results/
+

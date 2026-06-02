@@ -1,0 +1,127 @@
+# =============================================================================
+# Swarmtally – GitHub Actions CI/CD Pipeline
+# Runs on every push and pull request to main/master
+#
+# Jobs:
+#   1. backend-check  – Validates Python dependencies and imports
+#   2. frontend-check – Lints, type-checks, and builds the Next.js app
+# =============================================================================
+
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+# Cancel in-progress runs for the same branch/PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  # ── Backend Validation ──────────────────────────────────────────────────────
+  backend-check:
+    name: Backend – Python Check
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: backend/requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Verify app imports without errors
+        # Imports the module to catch syntax errors, missing packages, etc.
+        # Note: This intentionally skips model loading (best.pt not in CI)
+        run: |
+          python -c "
+          import sys, os
+          # Prevent model loading during import check
+          os.environ.setdefault('CI', 'true')
+
+          # Verify all imports resolve correctly
+          import fastapi
+          import uvicorn
+          import ultralytics
+          import cv2
+          import numpy
+          import PIL
+
+          print('\u2713 All backend imports resolved successfully')
+          print(f'  FastAPI: {fastapi.__version__}')
+          print(f'  Ultralytics: {ultralytics.__version__}')
+          print(f'  OpenCV: {cv2.__version__}')
+          "
+
+      - name: Check main.py for syntax errors
+        # Creates a dummy best.pt so the FileNotFoundError guard in main.py
+        # doesn't raise, allowing the full module to be compiled and checked.
+        run: |
+          touch best.pt
+          python -c "import ast, sys
+          with open('main.py') as f:
+              source = f.read()
+          ast.parse(source)
+          print('\u2713 main.py syntax OK')
+          "
+
+      - name: Check config module
+        run: python -c "from config import settings; print('✓ config.py OK')"
+
+      - name: Check logging module
+        run: python -c "from logging_config import setup_logging; print('✓ logging_config.py OK')"
+
+  # ── Frontend Validation ─────────────────────────────────────────────────────
+  frontend-check:
+    name: Frontend – Lint, Type-check & Build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Run TypeScript type check
+        run: npm run type-check
+
+      - name: Build production bundle
+        env:
+          # Provide a placeholder URL so Next.js build doesn't fail on missing env
+          NEXT_PUBLIC_API_URL: https://placeholder.onrender.com
+          # next.config.js output: 'standalone' requires this to be set
+          NODE_ENV: production
+        run: npm run build
+
+      - name: Report build size
+        run: |
+          echo "✓ Frontend build completed successfully"
+          du -sh .next/ 2>/dev/null || true

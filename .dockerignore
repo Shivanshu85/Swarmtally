@@ -1,0 +1,62 @@
+# =============================================================================
+# Swarmtally – .dockerignore
+# Prevents large/unnecessary files from being sent to the Docker build context
+# =============================================================================
+
+# ── Git ───────────────────────────────────────────────────────────────────────
+.git/
+.gitignore
+
+# ── Documentation ────────────────────────────────────────────────────────────
+README.md
+CONTRIBUTING.md
+LICENSE
+*.md
+
+# ── Python dev artifacts ──────────────────────────────────────────────────────
+**/__pycache__/
+**/*.py[cod]
+**/*.pyo
+**/.pytest_cache/
+**/.mypy_cache/
+**/.ruff_cache/
+**/venv/
+**/.venv/
+**/env/
+
+# ── Node.js ───────────────────────────────────────────────────────────────────
+**/node_modules/
+frontend/.next/
+frontend/out/
+frontend/build/
+
+# ── Dataset and training (not needed at runtime) ──────────────────────────────
+dataset/
+training_Results/
+
+# ── Environment files ─────────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+
+# ── IDE / OS ──────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# ── Logs ─────────────────────────────────────────────────────────────────────
+*.log
+logs/
+
+# ── Docker Compose override (local-only) ─────────────────────────────────────
+docker-compose.override.yml
+
+# ── GitHub Actions ────────────────────────────────────────────────────────────
+.github/
+
+# ── Backend runtime directories (re-created at container startup) ─────────────
+backend/uploads/
+backend/outputs/

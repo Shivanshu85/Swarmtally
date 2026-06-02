@@ -1,0 +1,45 @@
+# =============================================================================
+# Swarmtally – Render Deployment Configuration
+# Render reads this file to auto-configure the web service.
+#
+# Docs: https://render.com/docs/render-yaml-spec
+# =============================================================================
+
+services:
+  - type: web
+    name: swarmtally-backend
+    env: python
+    region: oregon  # Change to: oregon, frankfurt, singapore, ohio, virginia
+    plan: free       # Options: free, starter, standard, pro
+
+    # ── Build ───────────────────────────────────────────────────────────────
+    buildCommand: pip install -r requirements.txt
+
+    # ── Start ────────────────────────────────────────────────────────────────
+    # Render injects $PORT automatically — uvicorn must bind to it
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+
+    # ── Python runtime ────────────────────────────────────────────────────────
+    # Matches runtime.txt
+    pythonVersion: "3.11"
+
+    # ── Health check ──────────────────────────────────────────────────────────
+    healthCheckPath: /health
+
+    # ── Environment variables ─────────────────────────────────────────────────
+    envVars:
+      - key: FRONTEND_URL
+        value: https://your-app.vercel.app   # Update after Vercel deployment
+
+      # Render provides PORT automatically — do not set manually
+      # - key: PORT
+      #   value: 10000
+
+    # ── Persistent disk (optional) ────────────────────────────────────────────
+    # Uncomment to persist uploads and outputs across deploys.
+    # Note: Persistent disk requires a paid plan.
+    #
+    # disk:
+    #   name: swarmtally-data
+    #   mountPath: /app/data
+    #   sizeGB: 1
