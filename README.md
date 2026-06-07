@@ -426,7 +426,7 @@ Swarmtally uses the **"Duty and Honor"** design palette — a military tactical 
 
 ### Training
 
-The model was trained on a custom drone dataset located in `dataset/`. Training artifacts (curves, confusion matrix, validation results) are in `training_Results/`.
+The model was trained on a custom drone dataset located in [dataset/](file:///c:/Users/tshiv/OneDrive/Documents/Python/Drone_detection/dataset/). The complete training results, including training curves, confusion matrices, and validation results, are provided directly in this repository under the [training_Results/](file:///c:/Users/tshiv/OneDrive/Documents/Python/Drone_detection/training_Results/) folder.
 
 To retrain:
 ```bash
