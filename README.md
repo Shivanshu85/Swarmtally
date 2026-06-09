@@ -12,7 +12,7 @@
 
 **AI-powered web application that detects and counts drones in uploaded images using a trained YOLOv8 model.**
 
-[Live Demo](https://swarmtallycom-lovat.vercel.app) · [API Docs](https://docs.ultralytics.com/models/yolov8) · [Docker Setup](https://docs.docker.com/get-started/introduction/get-docker-desktop/) · [Deployment](https://vercel.com/docs/deployments)
+[Live Demo](https://swarmtallycom-lovat.vercel.app) · [API Docs](https://swarmtally-backend.onrender.com/docs) · [Docker Setup](https://docs.docker.com/get-started/introduction/get-docker-desktop/) · [Deployment](https://vercel.com/docs/deployments)
 
 </div>
 
